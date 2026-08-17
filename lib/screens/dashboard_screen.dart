@@ -1,0 +1,472 @@
+import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_theme.dart';
+import '../data/app_state.dart';
+import '../data/questionnaire_data.dart';
+import '../models/quiz_result.dart';
+import 'questionnaire_screen.dart';
+import 'programs_screen.dart';
+import 'analytics_screen.dart';
+
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  int _currentNavIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: _buildBody(),
+      ),
+      bottomNavigationBar: _buildBottomNav(),
+    );
+  }
+
+  Widget _buildBody() {
+    switch (_currentNavIndex) {
+      case 0:
+        return _buildDashboard(context);
+      case 2:
+        return const AnalyticsContent();
+      default:
+        return _buildPlaceholderScreen(_currentNavIndex);
+    }
+  }
+
+  Widget _buildDashboard(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          _buildHeader(),
+          const SizedBox(height: 24),
+          _buildSummaryCard(),
+          const SizedBox(height: 24),
+          _buildQuickActions(context),
+          const SizedBox(height: 24),
+          _buildRecentActivity(),
+          const SizedBox(height: 100),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Welcome Back! 👋',
+              style: AppTheme.headingLarge,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Find your perfect program match',
+              style: AppTheme.bodySmall.copyWith(fontSize: 14),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryCard() {
+    return ValueListenableBuilder<QuizResult?>(
+      valueListenable: AppState.latestResult,
+      builder: (context, result, _) {
+        final score = result != null ? AppState.fitScore : 0;
+        final hasResult = result != null;
+        final topDeptName = hasResult
+            ? QuestionnaireData.departments
+                .firstWhere((d) => d.code == result.topDepartmentCode)
+                .schoolName
+            : null;
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: AppTheme.cardDecoration,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Your Fit Score', style: AppTheme.headingSmall),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: hasResult
+                          ? AppColors.success.withValues(alpha: 0.12)
+                          : AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: hasResult ? AppColors.success : AppColors.primary,
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      hasResult ? 'COMPLETED' : 'LIVE',
+                      style: TextStyle(
+                        color: hasResult ? AppColors.success : AppColors.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    hasResult ? '$score' : '—',
+                    style: TextStyle(
+                      fontSize: 52,
+                      fontWeight: FontWeight.w900,
+                      color: hasResult ? AppColors.primary : AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      '/ 100',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: AppColors.border, width: 1),
+                ),
+                child: FractionallySizedBox(
+                  widthFactor: (score / 100).clamp(0.0, 1.0),
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: hasResult ? AppColors.success : AppColors.primary,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                hasResult
+                    ? 'Top match: $topDeptName'
+                    : 'Take the assessment to discover your top program match!',
+                style: AppTheme.bodySmall.copyWith(fontSize: 13),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context) {
+    final actions = [
+      _ActionItem(Icons.quiz_rounded, 'Take Quiz', 'Start assessment', AppColors.primary),
+      _ActionItem(Icons.school_rounded, 'Programs', 'Browse all', const Color(0xFFF97316)),
+      _ActionItem(Icons.analytics_rounded, 'Analytics', 'Your stats', const Color(0xFF16A34A)),
+      _ActionItem(Icons.bookmark_rounded, 'Saved', 'Favorites', const Color(0xFF8B5CF6)),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Quick Actions', style: AppTheme.headingSmall),
+        const SizedBox(height: 12),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.6,
+          ),
+          itemCount: actions.length,
+          itemBuilder: (context, index) {
+            final action = actions[index];
+            return GestureDetector(
+              onTap: () {
+                if (index == 0) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const QuestionnaireScreen(),
+                    ),
+                  );
+                } else if (index == 1) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProgramsScreen(),
+                    ),
+                  );
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: AppTheme.cardDecoration,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: action.color.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.border, width: 1),
+                      ),
+                      child: Icon(action.icon, size: 20, color: action.color),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(action.label, style: AppTheme.bodyMedium),
+                        Text(action.subtitle, style: AppTheme.bodySmall),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecentActivity() {
+    return ValueListenableBuilder<QuizResult?>(
+      valueListenable: AppState.latestResult,
+      builder: (context, result, _) {
+        final List<_ActivityItem> activities;
+
+        if (result != null) {
+          final topRec = result.recommendations.first;
+          final deptName = QuestionnaireData.departments
+              .firstWhere((d) => d.code == result.topDepartmentCode)
+              .schoolName;
+
+          activities = [
+            _ActivityItem(
+              Icons.check_circle_rounded,
+              'Assessment Completed',
+              'Top department: $deptName',
+              'Done',
+              color: AppColors.success,
+            ),
+            _ActivityItem(
+              Icons.star_rounded,
+              'Top Recommendation',
+              topRec.program.name,
+              '#${topRec.rank}',
+              color: AppColors.primary,
+            ),
+          ];
+        } else {
+          activities = [
+            _ActivityItem(Icons.schedule, 'Assessment Not Started', 'Complete the quiz to see your results', 'Just now'),
+            _ActivityItem(Icons.star_border, 'No Recommendations Yet', 'Finish the assessment first', '—'),
+          ];
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Recent Activity', style: AppTheme.headingSmall),
+            const SizedBox(height: 12),
+            ...activities.map((a) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: AppTheme.cardDecoration,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: a.color.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: a.color, width: 1),
+                          ),
+                          child: Icon(a.icon, size: 20, color: a.color),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(a.title, style: AppTheme.bodyMedium),
+                              const SizedBox(height: 2),
+                              Text(a.subtitle, style: AppTheme.bodySmall),
+                            ],
+                          ),
+                        ),
+                        Text(a.time, style: AppTheme.bodySmall.copyWith(fontSize: 11)),
+                      ],
+                    ),
+                  ),
+                )),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildBottomNav() {
+    final items = [
+      _NavItem(Icons.home_rounded, 'Home'),
+      _NavItem(Icons.explore_rounded, 'Explore'),
+      _NavItem(Icons.analytics_rounded, 'Analytics'),
+      _NavItem(Icons.settings_rounded, 'Settings'),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border(
+          top: BorderSide(color: AppColors.border, width: AppTheme.borderWidth),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(items.length, (index) {
+            final item = items[index];
+            final isActive = _currentNavIndex == index;
+            return GestureDetector(
+              onTap: () => setState(() => _currentNavIndex = index),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: isActive
+                    ? BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.border, width: 1),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: AppColors.shadow,
+                            offset: Offset(2, 2),
+                            blurRadius: 0,
+                          ),
+                        ],
+                      )
+                    : null,
+                child: Row(
+                  children: [
+                    Icon(
+                      item.icon,
+                      size: 22,
+                      color: isActive ? Colors.white : AppColors.textSecondary,
+                    ),
+                    if (isActive) ...[
+                      const SizedBox(width: 6),
+                      Text(
+                        item.label,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderScreen(int index) {
+    final titles = ['', 'Explore', 'Analytics', 'Settings'];
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            index == 1
+                ? Icons.explore_rounded
+                : index == 2
+                    ? Icons.analytics_rounded
+                    : Icons.settings_rounded,
+            size: 64,
+            color: AppColors.textSecondary.withValues(alpha: 0.4),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            titles[index],
+            style: AppTheme.headingMedium.copyWith(color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Coming Soon',
+            style: AppTheme.bodySmall.copyWith(fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionItem {
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final Color color;
+
+  const _ActionItem(this.icon, this.label, this.subtitle, this.color);
+}
+
+class _ActivityItem {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String time;
+  final Color color;
+
+  const _ActivityItem(this.icon, this.title, this.subtitle, this.time, {this.color = AppColors.textSecondary});
+}
+
+class _NavItem {
+  final IconData icon;
+  final String label;
+
+  const _NavItem(this.icon, this.label);
+}
