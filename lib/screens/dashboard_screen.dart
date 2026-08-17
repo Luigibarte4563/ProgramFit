@@ -7,7 +7,7 @@ import '../models/quiz_result.dart';
 import 'questionnaire_screen.dart';
 import 'programs_screen.dart';
 import 'analytics_screen.dart';
-import 'saved_screen.dart';
+import 'settings_screen.dart';
 import 'explore_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -40,7 +40,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 2:
         return const AnalyticsContent();
       case 3:
-        return const SavedScreen();
+        return const SettingsScreen();
       default:
         return _buildPlaceholderScreen(_currentNavIndex);
     }
@@ -200,7 +200,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _ActionItem(Icons.quiz_rounded, 'Take Quiz', 'Start assessment', AppColors.primary),
       _ActionItem(Icons.school_rounded, 'Programs', 'Browse all', const Color(0xFFF97316)),
       _ActionItem(Icons.analytics_rounded, 'Analytics', 'Your stats', const Color(0xFF16A34A)),
-      _ActionItem(Icons.bookmark_rounded, 'Saved', 'Favorites', const Color(0xFF8B5CF6)),
+      _ActionItem(Icons.settings_rounded, 'Settings', 'App settings', const Color(0xFF8B5CF6)),
     ];
 
     return Column(
@@ -239,12 +239,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 } else if (index == 2) {
                   setState(() => _currentNavIndex = 2);
                 } else if (index == 3) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SavedScreen(),
-                    ),
-                  );
+                  setState(() => _currentNavIndex = 3);
                 }
               },
               child: Container(
@@ -366,7 +361,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _NavItem(Icons.home_rounded, 'Home'),
       _NavItem(Icons.explore_rounded, 'Explore'),
       _NavItem(Icons.analytics_rounded, 'Analytics'),
-      _NavItem(Icons.bookmark_rounded, 'Saved'),
+      _NavItem(Icons.settings_rounded, 'Settings'),
     ];
 
     return Container(

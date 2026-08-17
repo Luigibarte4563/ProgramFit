@@ -193,22 +193,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                             ),
                           ),
                         ),
-                        if (program.isFlagship)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: deptColor,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Text(
-                              'FLAGSHIP',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 9,
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                   );
