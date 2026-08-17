@@ -22,8 +22,21 @@ class StorageHelper {
     if (jsonString == null) return null;
     try {
       final json = jsonDecode(jsonString) as Map<String, dynamic>;
-      return _resultFromJson(json);
+      final result = _resultFromJson(json);
+      // Validate: ensure all codes exist in current data
+      final deptValid = result.departmentScores.every(
+        (ds) => QuestionnaireData.departments.any((d) => d.code == ds.department.code),
+      );
+      final topValid = QuestionnaireData.departments.any(
+        (d) => d.code == result.topDepartmentCode,
+      );
+      if (!deptValid || !topValid) {
+        await clearQuizResult();
+        return null;
+      }
+      return result;
     } catch (_) {
+      await clearQuizResult();
       return null;
     }
   }

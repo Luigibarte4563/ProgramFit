@@ -16,13 +16,13 @@ class AppColors {
   static const Color error = Color(0xFFDC2626);
 
   static const Map<String, Color> departmentColors = {
-    'IT': Color(0xFF2563EB),
-    'ENG': Color(0xFFF97316),
-    'ED': Color(0xFF16A34A),
-    'BUS': Color(0xFFD97706),
-    'HM': Color(0xFF8B5CF6),
-    'HUM': Color(0xFFEC4899),
-    'HS': Color(0xFF06B6D4),
-    'CRIM': Color(0xFF64748B),
+    'SITE': Color(0xFF6B7280),
+    'SOE': Color(0xFFF97316),
+    'STE': Color(0xFF2563EB),
+    'SBA': Color(0xFFCA8A04),
+    'SIHM': Color(0xFFDC2626),
+    'SOH': Color(0xFF8B5CF6),
+    'SOHS': Color(0xFF16A34A),
+    'SOC': Color(0xFF7F1D1D),
   };
 }

@@ -413,7 +413,8 @@ class ResultsScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   QuestionnaireData.departments
-                      .firstWhere((d) => d.code == rec.program.departmentCode)
+                      .firstWhere((d) => d.code == rec.program.departmentCode,
+                          orElse: () => QuestionnaireData.departments.first)
                       .schoolName,
                   style: AppTheme.bodySmall.copyWith(fontSize: 12),
                 ),
