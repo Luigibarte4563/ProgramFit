@@ -7,6 +7,8 @@ import '../models/quiz_result.dart';
 import 'questionnaire_screen.dart';
 import 'programs_screen.dart';
 import 'analytics_screen.dart';
+import 'settings_screen.dart';
+import 'explore_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -33,8 +35,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     switch (_currentNavIndex) {
       case 0:
         return _buildDashboard(context);
+      case 1:
+        return const ExploreScreen();
       case 2:
         return const AnalyticsContent();
+      case 3:
+        return const SettingsScreen();
       default:
         return _buildPlaceholderScreen(_currentNavIndex);
     }
@@ -90,7 +96,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final hasResult = result != null;
         final topDeptName = hasResult
             ? QuestionnaireData.departments
-                .firstWhere((d) => d.code == result.topDepartmentCode)
+                .firstWhere((d) => d.code == result.topDepartmentCode,
+                  orElse: () => QuestionnaireData.departments.first)
                 .schoolName
             : null;
 
@@ -193,7 +200,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _ActionItem(Icons.quiz_rounded, 'Take Quiz', 'Start assessment', AppColors.primary),
       _ActionItem(Icons.school_rounded, 'Programs', 'Browse all', const Color(0xFFF97316)),
       _ActionItem(Icons.analytics_rounded, 'Analytics', 'Your stats', const Color(0xFF16A34A)),
-      _ActionItem(Icons.bookmark_rounded, 'Saved', 'Favorites', const Color(0xFF8B5CF6)),
+      _ActionItem(Icons.settings_rounded, 'Settings', 'App settings', const Color(0xFF8B5CF6)),
     ];
 
     return Column(
@@ -229,6 +236,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       builder: (context) => const ProgramsScreen(),
                     ),
                   );
+                } else if (index == 2) {
+                  setState(() => _currentNavIndex = 2);
+                } else if (index == 3) {
+                  setState(() => _currentNavIndex = 3);
                 }
               },
               child: Container(
@@ -274,7 +285,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (result != null) {
           final topRec = result.recommendations.first;
           final deptName = QuestionnaireData.departments
-              .firstWhere((d) => d.code == result.topDepartmentCode)
+              .firstWhere((d) => d.code == result.topDepartmentCode,
+                  orElse: () => QuestionnaireData.departments.first)
               .schoolName;
 
           activities = [
@@ -415,7 +427,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildPlaceholderScreen(int index) {
-    final titles = ['', 'Explore', 'Analytics', 'Settings'];
+    final titles = ['', 'Explore'];
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -423,15 +435,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Icon(
             index == 1
                 ? Icons.explore_rounded
-                : index == 2
-                    ? Icons.analytics_rounded
-                    : Icons.settings_rounded,
+                : Icons.bookmark_rounded,
             size: 64,
             color: AppColors.textSecondary.withValues(alpha: 0.4),
           ),
           const SizedBox(height: 16),
           Text(
-            titles[index],
+            index < titles.length ? titles[index] : '',
             style: AppTheme.headingMedium.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 8),

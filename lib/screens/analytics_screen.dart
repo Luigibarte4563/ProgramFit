@@ -332,7 +332,8 @@ class AnalyticsContent extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             QuestionnaireData.departments
-                .firstWhere((d) => d.code == result.topDepartmentCode)
+                .firstWhere((d) => d.code == result.topDepartmentCode,
+                    orElse: () => QuestionnaireData.departments.first)
                 .schoolName,
             style: AppTheme.bodySmall,
           ),

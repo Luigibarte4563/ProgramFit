@@ -51,7 +51,8 @@ class QuizResult {
   });
 
   DepartmentScore get topDepartment =>
-      departmentScores.firstWhere((d) => d.department.code == topDepartmentCode);
+      departmentScores.firstWhere((d) => d.department.code == topDepartmentCode,
+          orElse: () => departmentScores.first);
 
   List<DepartmentScore> get top3Departments => departmentScores.take(3).toList();
 }

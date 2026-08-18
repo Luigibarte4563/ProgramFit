@@ -195,13 +195,15 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
 
     final deptScoresList = sortedDepts
         .map((e) => DepartmentScore(
-              department: QuestionnaireData.departments.firstWhere((d) => d.code == e.key),
+              department: QuestionnaireData.departments.firstWhere((d) => d.code == e.key,
+                          orElse: () => QuestionnaireData.departments.first),
               score: e.value,
             ))
         .toList();
 
     final topDept = sortedDepts[0].key;
-    final topDeptObj = QuestionnaireData.departments.firstWhere((d) => d.code == topDept);
+    final topDeptObj = QuestionnaireData.departments.firstWhere((d) => d.code == topDept,
+        orElse: () => QuestionnaireData.departments.first);
     final isSingle = QuestionnaireData.isSingleProgramDepartment(topDept);
 
     List<ProgramScore>? programScores;
@@ -223,7 +225,8 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
 
       if (sortedDepts.length >= 2) {
         final dept2 = sortedDepts[1].key;
-        final dept2Obj = QuestionnaireData.departments.firstWhere((d) => d.code == dept2);
+        final dept2Obj = QuestionnaireData.departments.firstWhere((d) => d.code == dept2,
+            orElse: () => QuestionnaireData.departments.first);
         final flagship2 = QuestionnaireData.programs[dept2Obj.flagshipProgramCode]!;
         recommendations.add(Recommendation(
           rank: 2,
@@ -234,7 +237,8 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
 
       if (sortedDepts.length >= 3) {
         final dept3 = sortedDepts[2].key;
-        final dept3Obj = QuestionnaireData.departments.firstWhere((d) => d.code == dept3);
+        final dept3Obj = QuestionnaireData.departments.firstWhere((d) => d.code == dept3,
+            orElse: () => QuestionnaireData.departments.first);
         final flagship3 = QuestionnaireData.programs[dept3Obj.flagshipProgramCode]!;
         recommendations.add(Recommendation(
           rank: 3,
@@ -289,7 +293,8 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
             basis: RecommendationBasis.secondProgramInDepartment,
           ));
         } else if (sortedDepts.length >= 2) {
-          final dept2Obj = QuestionnaireData.departments.firstWhere((d) => d.code == sortedDepts[1].key);
+          final dept2Obj = QuestionnaireData.departments.firstWhere((d) => d.code == sortedDepts[1].key,
+              orElse: () => QuestionnaireData.departments.first);
           final flagship2 = QuestionnaireData.programs[dept2Obj.flagshipProgramCode]!;
           recommendations.add(Recommendation(
             rank: 2,
@@ -306,7 +311,8 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
             basis: RecommendationBasis.flagshipOfThirdDepartment,
           ));
         } else if (sortedDepts.length >= 3) {
-          final dept3Obj = QuestionnaireData.departments.firstWhere((d) => d.code == sortedDepts[2].key);
+          final dept3Obj = QuestionnaireData.departments.firstWhere((d) => d.code == sortedDepts[2].key,
+              orElse: () => QuestionnaireData.departments.first);
           final flagship3 = QuestionnaireData.programs[dept3Obj.flagshipProgramCode]!;
           recommendations.add(Recommendation(
             rank: 3,
